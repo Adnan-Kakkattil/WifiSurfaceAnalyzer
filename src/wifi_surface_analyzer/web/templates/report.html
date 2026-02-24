@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="flex flex-col gap-6">
+    <section class="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 class="text-xl font-semibold">Report {{ report_id }}</h1>
+          <div class="mt-2 text-sm text-slate-300">
+            Source: <span class="font-mono text-slate-200">{{ meta.source }}</span>
+          </div>
+          <div class="mt-1 text-sm text-slate-300">
+            Generated: <span class="font-mono text-slate-200">{{ meta.generated_at }}</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <a class="rounded-xl bg-slate-800 px-4 py-2 text-sm font-semibold hover:bg-slate-700" href="/reports/{{ report_id }}.json">Download JSON</a>
+          <a class="rounded-xl bg-slate-800 px-4 py-2 text-sm font-semibold hover:bg-slate-700" href="/">New scan</a>
+        </div>
+      </div>
+
+      <div class="mt-6 grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div class="rounded-xl border border-slate-800 bg-slate-950/50 p-3">
+          <div class="text-xs text-slate-400">Total APs</div>
+          <div class="text-lg font-semibold">{{ summary.total }}</div>
+        </div>
+        <div class="rounded-xl border border-slate-800 bg-slate-950/50 p-3">
+          <div class="text-xs text-slate-400">CRITICAL</div>
+          <div class="text-lg font-semibold text-red-400">{{ summary.counts.CRITICAL }}</div>
+        </div>
+        <div class="rounded-xl border border-slate-800 bg-slate-950/50 p-3">
+          <div class="text-xs text-slate-400">HIGH</div>
+          <div class="text-lg font-semibold text-red-300">{{ summary.counts.HIGH }}</div>
+        </div>
+        <div class="rounded-xl border border-slate-800 bg-slate-950/50 p-3">
+          <div class="text-xs text-slate-400">MEDIUM</div>
+          <div class="text-lg font-semibold text-yellow-300">{{ summary.counts.MEDIUM }}</div>
+        </div>
+        <div class="rounded-xl border border-slate-800 bg-slate-950/50 p-3">
+          <div class="text-xs text-slate-400">LOW</div>
+          <div class="text-lg font-semibold text-green-300">{{ summary.counts.LOW }}</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="rounded-2xl border border-slate-800 bg-slate-900/40 p-0 overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+        <div class="text-sm font-semibold text-slate-200">Access points (sorted by risk)</div>
+        <div class="text-xs text-slate-400">Tip: click a row to view factor breakdown.</div>
+      </div>
+
+      <div class="overflow-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="text-xs uppercase text-slate-400 bg-slate-950/40">
+            <tr>
+              <th class="px-4 py-3">Risk</th>
+              <th class="px-4 py-3">Level</th>
+              <th class="px-4 py-3">BSSID</th>
+              <th class="px-4 py-3">SSID</th>
+              <th class="px-4 py-3">Encryption</th>
+              <th class="px-4 py-3">Channel</th>
+              <th class="px-4 py-3">Band</th>
+              <th class="px-4 py-3">RSSI</th>
+              <th class="px-4 py-3">Beacons</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ap in access_points %}
+              <tr class="border-t border-slate-800 hover:bg-slate-950/40">
+                <td class="px-4 py-3 font-mono">{{ ap.risk_score }}</td>
+                <td class="px-4 py-3">
+                  {% if ap.risk_level == "CRITICAL" %}
+                    <span class="text-red-400 font-semibold">CRITICAL</span>
+                  {% elif ap.risk_level == "HIGH" %}
+                    <span class="text-red-300 font-semibold">HIGH</span>
+                  {% elif ap.risk_level == "MEDIUM" %}
+                    <span class="text-yellow-300 font-semibold">MEDIUM</span>
+                  {% else %}
+                    <span class="text-green-300 font-semibold">LOW</span>
+                  {% endif %}
+                </td>
+                <td class="px-4 py-3 font-mono text-slate-200">{{ ap.bssid }}</td>
+                <td class="px-4 py-3">
+                  {% if ap.ssid %}
+                    <span class="text-slate-100">{{ ap.ssid }}</span>
+                  {% elif ap.ssid_hidden %}
+                    <span class="text-slate-400">&lt;hidden&gt;</span>
+                  {% else %}
+                    <span class="text-slate-400">&lt;unknown&gt;</span>
+                  {% endif %}
+                </td>
+                <td class="px-4 py-3 font-mono">{{ ap.encryption }}</td>
+                <td class="px-4 py-3 font-mono">{{ ap.channel if ap.channel is not none else "" }}</td>
+                <td class="px-4 py-3 font-mono">{{ ap.band }}</td>
+                <td class="px-4 py-3 font-mono">
+                  {% if ap.rssi_dbm is not none %}
+                    {{ "%.0f"|format(ap.rssi_dbm) }} dBm
+                  {% endif %}
+                </td>
+                <td class="px-4 py-3 font-mono">{{ ap.beacon_count }}</td>
+              </tr>
+              <tr class="border-b border-slate-800 bg-slate-950/20">
+                <td class="px-4 py-3 text-xs text-slate-300" colspan="9">
+                  <details>
+                    <summary class="cursor-pointer text-slate-400 hover:text-slate-200">Risk factor breakdown</summary>
+                    <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2">
+                      <div class="rounded-xl border border-slate-800 bg-slate-950/50 p-3">
+                        <div class="text-xs text-slate-400">Encryption</div>
+                        <div class="text-sm font-mono">{{ ap.risk_factors.encryption.points }} pts</div>
+                        <div class="text-xs text-slate-300">{{ ap.risk_factors.encryption.reason }}</div>
+                      </div>
+                      <div class="rounded-xl border border-slate-800 bg-slate-950/50 p-3">
+                        <div class="text-xs text-slate-400">Discoverability</div>
+                        <div class="text-sm font-mono">{{ ap.risk_factors.discoverability.points }} pts</div>
+                        <div class="text-xs text-slate-300">{{ ap.risk_factors.discoverability.reason }}</div>
+                      </div>
+                      <div class="rounded-xl border border-slate-800 bg-slate-950/50 p-3">
+                        <div class="text-xs text-slate-400">Signal leakage</div>
+                        <div class="text-sm font-mono">{{ ap.risk_factors.signal_leakage.points }} pts</div>
+                        <div class="text-xs text-slate-300">{{ ap.risk_factors.signal_leakage.reason }}</div>
+                      </div>
+                      <div class="rounded-xl border border-slate-800 bg-slate-950/50 p-3">
+                        <div class="text-xs text-slate-400">Channel/band</div>
+                        <div class="text-sm font-mono">{{ ap.risk_factors.channel_band.points }} pts</div>
+                        <div class="text-xs text-slate-300">{{ ap.risk_factors.channel_band.reason }}</div>
+                      </div>
+                    </div>
+                  </details>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+{% endblock %}
+

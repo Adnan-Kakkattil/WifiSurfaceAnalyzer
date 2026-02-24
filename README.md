@@ -50,6 +50,16 @@ Example:
 sudo python -m wifi_surface_analyzer scan live --iface wlan0mon --seconds 30 --out reports\scan.json --format both
 ```
 
+### Web UI
+
+Start the local Web UI:
+
+```bash
+wsa-web --host 127.0.0.1 --port 8000
+```
+
+Then open `http://127.0.0.1:8000` in your browser and upload a `.pcap` / `.pcapng`.
+
 ### Project layout
 
 - `src/wifi_surface_analyzer/cli.py`: CLI entrypoints (`scan`, `report`)
@@ -57,6 +67,7 @@ sudo python -m wifi_surface_analyzer scan live --iface wlan0mon --seconds 30 --o
 - `src/wifi_surface_analyzer/risk.py`: feasibility-oriented scoring + labels
 - `src/wifi_surface_analyzer/reporting.py`: Rich tables / summaries
 - `src/wifi_surface_analyzer/io.py`: JSON save/load
+- `src/wifi_surface_analyzer/web/`: FastAPI Web UI (upload + report pages)
 
 ### Ethics / legal
 
