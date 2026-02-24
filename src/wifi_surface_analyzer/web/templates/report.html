@@ -14,6 +14,7 @@
         </div>
         <div class="flex items-center gap-3">
           <a class="rounded-xl bg-slate-800 px-4 py-2 text-sm font-semibold hover:bg-slate-700" href="/reports/{{ report_id }}.json">Download JSON</a>
+          <a class="rounded-xl bg-slate-800 px-4 py-2 text-sm font-semibold hover:bg-slate-700" href="/reports/{{ report_id }}.csv?{{ request.query_params }}">Download CSV</a>
           <a class="rounded-xl bg-slate-800 px-4 py-2 text-sm font-semibold hover:bg-slate-700" href="/">New scan</a>
         </div>
       </div>
@@ -44,8 +45,45 @@
 
     <section class="rounded-2xl border border-slate-800 bg-slate-900/40 p-0 overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
-        <div class="text-sm font-semibold text-slate-200">Access points (sorted by risk)</div>
-        <div class="text-xs text-slate-400">Tip: click a row to view factor breakdown.</div>
+        <div class="text-sm font-semibold text-slate-200">
+          Access points (filtered: {{ summary_filtered.total }} / {{ summary.total }})
+        </div>
+        <div class="text-xs text-slate-400">Tip: open “Risk factor breakdown” for details.</div>
+      </div>
+
+      <div class="px-6 py-4 border-b border-slate-800 bg-slate-950/20">
+        <form class="grid grid-cols-1 md:grid-cols-5 gap-3" method="get">
+          <div class="md:col-span-2">
+            <label class="block text-xs text-slate-400 mb-1">Search (SSID or BSSID contains)</label>
+            <input class="w-full rounded-xl border border-slate-800 bg-slate-950/40 px-3 py-2 text-sm" name="q" value="{{ filters.q }}" placeholder="e.g. cafe, 00:11:22" />
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Min risk</label>
+            <input class="w-full rounded-xl border border-slate-800 bg-slate-950/40 px-3 py-2 text-sm" name="min_risk" type="number" min="0" max="100" value="{{ filters.min_risk }}" placeholder="0" />
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Level</label>
+            <select class="w-full rounded-xl border border-slate-800 bg-slate-950/40 px-3 py-2 text-sm" name="level">
+              <option value="" {% if filters.level == "" %}selected{% endif %}>Any</option>
+              <option value="CRITICAL" {% if filters.level == "CRITICAL" %}selected{% endif %}>CRITICAL</option>
+              <option value="HIGH" {% if filters.level == "HIGH" %}selected{% endif %}>HIGH</option>
+              <option value="MEDIUM" {% if filters.level == "MEDIUM" %}selected{% endif %}>MEDIUM</option>
+              <option value="LOW" {% if filters.level == "LOW" %}selected{% endif %}>LOW</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Encryption</label>
+            <input class="w-full rounded-xl border border-slate-800 bg-slate-950/40 px-3 py-2 text-sm font-mono" name="encryption" value="{{ filters.encryption }}" placeholder="e.g. WPA2-PSK" />
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Band contains</label>
+            <input class="w-full rounded-xl border border-slate-800 bg-slate-950/40 px-3 py-2 text-sm font-mono" name="band" value="{{ filters.band }}" placeholder="2.4, 5" />
+          </div>
+          <div class="md:col-span-5 flex items-center gap-3">
+            <button class="rounded-xl bg-indigo-500 px-4 py-2 text-sm font-semibold hover:bg-indigo-400" type="submit">Apply filters</button>
+            <a class="text-sm text-slate-300 hover:text-white" href="/reports/{{ report_id }}">Clear</a>
+          </div>
+        </form>
       </div>
 
       <div class="overflow-auto">

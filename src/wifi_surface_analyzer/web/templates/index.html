@@ -34,6 +34,33 @@
           </div>
         </form>
       </div>
+
+      <div class="mt-6 rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+        <h2 class="text-lg font-semibold">Live capture</h2>
+        <p class="mt-2 text-sm text-slate-300">
+          Starts a passive sniff and analyzes beacons/probe responses. Requires Linux monitor mode and privileges.
+        </p>
+
+        {% if not live_supported %}
+          <div class="mt-4 rounded-xl border border-slate-800 bg-slate-950/40 p-4 text-sm text-slate-300">
+            Live capture is disabled on this OS. Use PCAP upload on Windows.
+          </div>
+        {% else %}
+          <form class="mt-5 grid grid-cols-1 md:grid-cols-3 gap-4" action="/scan/live" method="post">
+            <div>
+              <label class="block text-sm text-slate-300 mb-2">Interface</label>
+              <input class="w-full rounded-xl border border-slate-800 bg-slate-950/40 px-3 py-2 text-sm" name="iface" placeholder="wlan0mon" required />
+            </div>
+            <div>
+              <label class="block text-sm text-slate-300 mb-2">Seconds</label>
+              <input class="w-full rounded-xl border border-slate-800 bg-slate-950/40 px-3 py-2 text-sm" name="seconds" type="number" value="30" min="1" />
+            </div>
+            <div class="flex items-end">
+              <button class="w-full rounded-xl bg-indigo-500 px-4 py-2 text-sm font-semibold hover:bg-indigo-400" type="submit">Start live scan</button>
+            </div>
+          </form>
+        {% endif %}
+      </div>
     </section>
 
     <aside>

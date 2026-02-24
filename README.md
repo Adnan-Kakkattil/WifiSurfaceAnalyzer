@@ -60,6 +60,13 @@ wsa-web --host 127.0.0.1 --port 8000
 
 Then open `http://127.0.0.1:8000` in your browser and upload a `.pcap` / `.pcapng`.
 
+Web features:
+
+- Upload PCAP/PCAPNG and view a ranked report
+- Filter/search results (SSID/BSSID, min risk, level, encryption, band)
+- Export JSON or CSV (CSV respects the active filters)
+- Live capture form (Linux monitor mode only; disabled on Windows)
+
 ### Project layout
 
 - `src/wifi_surface_analyzer/cli.py`: CLI entrypoints (`scan`, `report`)
