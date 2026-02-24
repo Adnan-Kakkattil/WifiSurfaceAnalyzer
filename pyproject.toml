@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wifi-surface-analyzer"
+version = "0.1.0"
+description = "Advanced Wi-Fi attack surface analyzer (passive recon + risk prioritization)."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "scapy>=2.5.0",
+  "rich>=13.7.0",
+]
+
+[project.scripts]
+wsa = "wifi_surface_analyzer.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

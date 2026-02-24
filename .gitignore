@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+pip-wheel-metadata/
+*.egg-info/
+.pytest_cache/
+
+# Builds
+build/
+dist/
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+Desktop.ini
+
+# Tool outputs
+reports/
+*.json
+*.pcap
+*.pcapng
+
